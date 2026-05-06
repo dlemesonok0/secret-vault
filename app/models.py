@@ -17,6 +17,7 @@ class Secret(Base):
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False, index=True)
     ciphertext: Mapped[str] = mapped_column(String, nullable=False)
     nonce: Mapped[str] = mapped_column(String, nullable=False)
+    crypto_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
 
@@ -31,3 +32,13 @@ class WrapToken(Base):
     used: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+
+class AuditEvent(Base):
+    __tablename__ = "audit_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    event_type: Mapped[str] = mapped_column(String, nullable=False, index=True)
+    subject: Mapped[str | None] = mapped_column(String, nullable=True)
+    outcome: Mapped[str] = mapped_column(String, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

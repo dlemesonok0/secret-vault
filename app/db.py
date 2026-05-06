@@ -1,8 +1,11 @@
 from collections.abc import Generator
+from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
+from alembic import command
+from alembic.config import Config
 from app.config import get_settings
 
 
@@ -22,6 +25,11 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
 def init_db() -> None:
+    alembic_ini = Path(__file__).resolve().parents[1] / "alembic.ini"
+    if alembic_ini.exists():
+        command.upgrade(Config(str(alembic_ini)), "head")
+        return
+
     import app.models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)

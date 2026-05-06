@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     unseal_min_parts: int = 3
     default_wrap_ttl_seconds: int = 60
     max_wrap_ttl_seconds: int = 300
+    unwrap_rate_limit_requests: int = 20
+    unwrap_rate_limit_window_seconds: int = 60
 
     model_config = SettingsConfigDict(
         env_file=".env",

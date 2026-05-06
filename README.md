@@ -11,6 +11,13 @@ docker compose up --build
 
 Сервис будет доступен на `http://localhost:8000`.
 
+Минимальный web-интерфейс:
+
+- `http://localhost:8000/ui` - admin-страница для seal/unseal, сохранения секрета и создания wrap-токена.
+- `http://localhost:8000/unwrap-ui` - публичная страница для одноразового unwrap по токену.
+
+Фронтенд не сохраняет токены и значения секретов в localStorage/sessionStorage. Wrap-токен вводится в тело запроса, а не в URL.
+
 ## Локальная проверка
 
 ```bash
@@ -45,6 +52,12 @@ curl http://localhost:8000/status
 
 ```json
 {"sealed":true}
+```
+
+Readiness-check для контейнера и оркестратора:
+
+```bash
+curl http://localhost:8000/ready
 ```
 
 ## Unseal
@@ -141,7 +154,11 @@ curl http://localhost:8000/secrets/database_password \
 ## Хранение и безопасность
 
 - Таблица `secrets` хранит `name`, `nonce`, `ciphertext`, даты создания и обновления.
+- Поле `crypto_version` зарезервировано для будущей ротации ключей и изменения формата шифрования.
 - `ciphertext` содержит результат AES-GCM вместе с authentication tag.
 - Для каждого шифрования создается новый случайный 12-байтовый nonce.
 - Таблица `wrap_tokens` хранит только SHA-256-хеш токена, имя секрета, TTL и состояние использования.
+- Таблица `audit_events` хранит технические события без plaintext, master key и wrap-токенов.
+- `/unwrap` ограничен простым in-memory rate limit по клиентскому IP. По умолчанию: 20 запросов за 60 секунд.
+- Схема БД управляется Alembic-миграциями при старте приложения.
 - `.env` не должен попадать в репозиторий; пример настроек находится в `.env.example`.
