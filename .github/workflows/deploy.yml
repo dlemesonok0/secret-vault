@@ -14,6 +14,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Validate deploy secrets
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          VAULT_ADMIN_TOKEN: ${{ secrets.VAULT_ADMIN_TOKEN }}
+        run: |
+          set -eu
+          test -n "$DEPLOY_HOST" || { echo "Missing repository secret: DEPLOY_HOST"; exit 1; }
+          test -n "$DEPLOY_USER" || { echo "Missing repository secret: DEPLOY_USER"; exit 1; }
+          test -n "$DEPLOY_SSH_KEY" || { echo "Missing repository secret: DEPLOY_SSH_KEY"; exit 1; }
+          test -n "$VAULT_ADMIN_TOKEN" || { echo "Missing repository secret: VAULT_ADMIN_TOKEN"; exit 1; }
+
       - name: Deploy container
         uses: appleboy/ssh-action@v1.0.3
         env:
