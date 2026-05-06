@@ -5,8 +5,8 @@ on:
     inputs:
       image:
         description: Docker image to deploy
-        required: true
-        default: ghcr.io/${{ github.repository }}:main
+        required: false
+        default: ""
 
 jobs:
   deploy:
@@ -17,15 +17,17 @@ jobs:
       - name: Deploy container
         uses: appleboy/ssh-action@v1.0.3
         env:
-          VAULT_IMAGE: ${{ inputs.image }}
+          INPUT_IMAGE: ${{ inputs.image }}
+          DEFAULT_IMAGE: ghcr.io/${{ github.repository }}:main
           VAULT_ADMIN_TOKEN: ${{ secrets.VAULT_ADMIN_TOKEN }}
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          envs: VAULT_IMAGE,VAULT_ADMIN_TOKEN
+          envs: INPUT_IMAGE,DEFAULT_IMAGE,VAULT_ADMIN_TOKEN
           script: |
             set -eu
+            VAULT_IMAGE="${INPUT_IMAGE:-$DEFAULT_IMAGE}"
             mkdir -p ~/secret-vault/data
             cd ~/secret-vault
             cat > docker-compose.yml <<'COMPOSE'
