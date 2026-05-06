@@ -14,9 +14,9 @@ docker compose up --build
 ## Локальная проверка
 
 ```bash
-python -m pip install -r requirements-dev.txt
-ruff check .
-pytest
+poetry install --with dev
+poetry run ruff check .
+poetry run pytest
 ```
 
 ## GitHub Actions

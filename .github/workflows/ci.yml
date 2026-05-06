@@ -28,13 +28,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
+          cache: poetry
+
+      - name: Install Poetry
+        run: python -m pip install poetry==1.8.3
 
       - name: Install dependencies
-        run: python -m pip install -r requirements-dev.txt
+        run: poetry install --with dev --no-root
 
       - name: Lint
-        run: ruff check .
+        run: poetry run ruff check .
 
       - name: Test
         env:
@@ -42,7 +45,7 @@ jobs:
           VAULT_ADMIN_TOKEN: change-me
           VAULT_UNSEAL_MIN_PARTS: "3"
           VAULT_DEFAULT_WRAP_TTL_SECONDS: "60"
-        run: pytest
+        run: poetry run pytest
 
   docker:
     name: Docker build and publish
