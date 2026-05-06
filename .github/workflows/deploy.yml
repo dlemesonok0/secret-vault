@@ -1,0 +1,48 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Docker image to deploy
+        required: true
+        default: ghcr.io/${{ github.repository }}:main
+
+jobs:
+  deploy:
+    name: Deploy over SSH
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy container
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          VAULT_IMAGE: ${{ inputs.image }}
+          VAULT_ADMIN_TOKEN: ${{ secrets.VAULT_ADMIN_TOKEN }}
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          envs: VAULT_IMAGE,VAULT_ADMIN_TOKEN
+          script: |
+            set -eu
+            mkdir -p ~/secret-vault/data
+            cd ~/secret-vault
+            cat > docker-compose.yml <<'COMPOSE'
+            services:
+              vault:
+                image: ${VAULT_IMAGE}
+                restart: unless-stopped
+                environment:
+                  VAULT_ADMIN_TOKEN: ${VAULT_ADMIN_TOKEN}
+                  DATABASE_URL: sqlite:///./data/vault.db
+                  VAULT_UNSEAL_MIN_PARTS: "3"
+                  VAULT_DEFAULT_WRAP_TTL_SECONDS: "60"
+                  VAULT_MAX_WRAP_TTL_SECONDS: "300"
+                ports:
+                  - "8000:8000"
+                volumes:
+                  - ./data:/app/data
+            COMPOSE
+            docker compose pull
+            docker compose up -d
