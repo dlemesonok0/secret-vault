@@ -16,10 +16,10 @@ jobs:
     steps:
       - name: Validate deploy secrets
         env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          VAULT_ADMIN_TOKEN: ${{ secrets.VAULT_ADMIN_TOKEN }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST || secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER || secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY || vars.DEPLOY_SSH_KEY }}
+          VAULT_ADMIN_TOKEN: ${{ secrets.VAULT_ADMIN_TOKEN || vars.VAULT_ADMIN_TOKEN }}
         run: |
           set -eu
           test -n "$DEPLOY_HOST" || { echo "Missing repository secret: DEPLOY_HOST"; exit 1; }
@@ -32,11 +32,11 @@ jobs:
         env:
           INPUT_IMAGE: ${{ inputs.image }}
           DEFAULT_IMAGE: ghcr.io/${{ github.repository }}:main
-          VAULT_ADMIN_TOKEN: ${{ secrets.VAULT_ADMIN_TOKEN }}
+          VAULT_ADMIN_TOKEN: ${{ secrets.VAULT_ADMIN_TOKEN || vars.VAULT_ADMIN_TOKEN }}
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          host: ${{ vars.DEPLOY_HOST || secrets.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER || secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY || vars.DEPLOY_SSH_KEY }}
           envs: INPUT_IMAGE,DEFAULT_IMAGE,VAULT_ADMIN_TOKEN
           script: |
             set -eu
