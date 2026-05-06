@@ -12,6 +12,9 @@ jobs:
   deploy:
     name: Deploy over SSH
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.DEPLOY_URL }}
 
     steps:
       - name: Validate deploy secrets

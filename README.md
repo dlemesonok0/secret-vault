@@ -143,10 +143,13 @@ poetry run pytest
 
 - `DEPLOY_HOST` - адрес сервера.
 - `DEPLOY_USER` - пользователь SSH.
+- `DEPLOY_URL` - публичная ссылка на развернутый сервис для GitHub Environments, например `http://203.0.113.10:8000` или `https://vault.example.com`.
 - `DEPLOY_SSH_KEY` - приватный SSH-ключ, лучше хранить как secret.
 - `VAULT_ADMIN_TOKEN` - admin token для сервиса, лучше хранить как secret.
 
 На сервере должны быть установлены Docker и Docker Compose plugin. Workflow создаст `~/secret-vault/docker-compose.yml`, подключит volume `~/secret-vault/data:/app/data` и поднимет контейнер на порту `8000`.
+
+Deploy workflow привязан к GitHub Environment `production`. Если задана repository variable `DEPLOY_URL`, GitHub покажет ссылку на текущее развернутое приложение в UI workflow/deployment.
 
 ## Проверка состояния
 
