@@ -41,6 +41,7 @@ jobs:
           script: |
             set -eu
             VAULT_IMAGE="${INPUT_IMAGE:-$DEFAULT_IMAGE}"
+            export VAULT_IMAGE VAULT_ADMIN_TOKEN
             mkdir -p ~/secret-vault/data
             cd ~/secret-vault
             cat > docker-compose.yml <<'COMPOSE'
