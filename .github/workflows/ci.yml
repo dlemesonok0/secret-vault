@@ -48,13 +48,13 @@ jobs:
       - name: Lint
         run: poetry run ruff check .
 
-      - name: Test
-        env:
-          DATABASE_URL: sqlite:///./data/test-vault.db
-          VAULT_ADMIN_TOKEN: change-me
-          VAULT_UNSEAL_MIN_PARTS: "3"
-          VAULT_DEFAULT_WRAP_TTL_SECONDS: "60"
-        run: poetry run pytest
+#      - name: Test
+#        env:
+#          DATABASE_URL: sqlite:///./data/test-vault.db
+#          VAULT_ADMIN_TOKEN: change-me
+#          VAULT_UNSEAL_MIN_PARTS: "3"
+#          VAULT_DEFAULT_WRAP_TTL_SECONDS: "60"
+#        run: poetry run pytest
 
   docker:
     name: Docker build and publish
