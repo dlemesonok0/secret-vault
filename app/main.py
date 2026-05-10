@@ -70,21 +70,21 @@ def unwrap_ui_page():
     return unwrap_ui()
 
 
-@app.post("/unseal", response_model=MessageResponse, dependencies=[Depends(require_admin)])
+@app.post("/unseal", response_model=MessageResponse, dependencies=[Depends(require_admin)], response_model_exclude_none=True)
 def unseal(payload: UnsealRequest, db: Session = Depends(get_db)) -> MessageResponse:
     vault_state.unseal(payload.parts)
     record_audit_event(db, "vault.unseal", "success")
     return MessageResponse(sealed=False, message="Vault unsealed")
 
 
-@app.post("/seal", response_model=MessageResponse, dependencies=[Depends(require_admin)])
+@app.post("/seal", response_model=MessageResponse, dependencies=[Depends(require_admin)], response_model_exclude_none=True)
 def seal(db: Session = Depends(get_db)) -> MessageResponse:
     vault_state.seal()
     record_audit_event(db, "vault.seal", "success")
     return MessageResponse(sealed=True, message="Vault sealed")
 
 
-@app.post("/secrets", response_model=MessageResponse, dependencies=[Depends(require_admin)])
+@app.post("/secrets", response_model=MessageResponse, dependencies=[Depends(require_admin)], response_model_exclude_none=True)
 def upsert_secret(payload: SecretUpsertRequest, db: Session = Depends(get_db)) -> MessageResponse:
     master_key = vault_state.require_unsealed()
     nonce, ciphertext = encrypt_secret(master_key, payload.value)
